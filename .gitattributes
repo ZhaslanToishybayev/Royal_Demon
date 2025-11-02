@@ -1,0 +1,42 @@
+# Автоматическое определение языка
+*.java linguist-language=Java
+*.gradle linguist-language=Groovy
+*.md linguist-language=Markdown
+
+# Исключение из статистики языков
+*.log linguist-generated=true
+build/ linguist-generated=true
+.gradle/ linguist-generated=true
+.github/ linguist-vendored=false
+
+# Установка EOL (End of Line)
+*.java text eol=lf
+*.gradle text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.sh text eol=lf
+
+# Бинарные файлы
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.wav binary
+*.mp3 binary
+*.jar binary
+
+# Файлы локализации
+*.properties text eol=lf
+
+# Конфигурационные файлы
+*.xml text eol=lf
+*.json text eol=lf
+
+# Отчеты и документация (исключаем из языков)
+*.log linguist-generated=true
+DETAILED_PROBLEM_ANALYSIS.md linguist-documentation=true
+SYSTEMS_ANALYSIS_SUPPLEMENT.md linguist-documentation=true
+FINAL_ANALYSIS_REPORT.md linguist-documentation=true
+CONTRIBUTING.md linguist-documentation=true
+SECURITY.md linguist-documentation=true
