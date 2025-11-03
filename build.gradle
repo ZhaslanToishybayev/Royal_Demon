@@ -1,0 +1,105 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'checkstyle'
+    id 'com.github.spotbugs' version '5.0.14'
+}
+
+checkstyle {
+    toolVersion = '10.17.0'
+    configFile = file('cs2340_checks.xml')
+    maxWarnings = 0
+    ignoreFailures = false
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.typhon0:AnimateFX:1.2.1'
+    implementation 'com.github.almasb:fxgl:17.3'
+    testImplementation 'com.github.almasb:fxgl:17.3'
+    testImplementation 'com.github.almasb:fxgl-test:17.3'
+    compileOnly 'com.github.spotbugs:spotbugs-annotations:4.8.3'
+    annotationProcessor 'com.github.spotbugs:spotbugs-annotations:4.8.3'
+
+    // JSON/YAML Processing
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2'
+
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation 'ch.qos.logback:logback-classic:1.4.11'
+
+    testImplementation platform('org.junit:junit-bom:5.10.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'org.testfx:testfx-core:4.0.16-alpha'
+    testImplementation 'org.testfx:testfx-junit5:4.0.16-alpha'
+    testImplementation 'org.mockito:mockito-core:5.10.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        xml.required = false
+        html.required = true
+    }
+}
+
+spotbugs {
+    toolVersion = '4.8.3'
+    showStackTraces = true
+    effort = 'max'
+    reportLevel = 'medium'
+    ignoreFailures = false
+}
+
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    reports.create('html') {
+        required.set(true)
+        outputLocation.set(layout.buildDirectory.file("reports/spotbugs/${name}.html"))
+    }
+    reports.create('xml') {
+        required.set(false)
+    }
+}
+
+javafx {
+    version = "21.0.2"
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.swing', 'javafx.media']
+}
+
+application {
+    mainClass = 'uwu.openjfx.MainApp'
+}
+
+// jlink плагин удален для избежания проблем с модулями
+
+tasks.named('jar') {
+    archiveBaseName.set('royal-demons')
+    manifest {
+        attributes 'Main-Class': 'uwu.openjfx.MainApp'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
