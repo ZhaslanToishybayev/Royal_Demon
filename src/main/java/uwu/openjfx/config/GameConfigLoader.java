@@ -73,17 +73,56 @@ public class GameConfigLoader {
 
     @SuppressWarnings("unchecked")
     public double getWeaponDamage(String weaponId) {
+        if (weaponId == null || weaponId.trim().isEmpty()) {
+            GameLogger.warn("Weapon ID is null or empty, using default damage");
+            return 50.0;
+        }
+
         Map<String, Object> weapon = (Map<String, Object>) weaponsConfig.get(weaponId);
-        return weapon != null ? ((Number) weapon.get("attackDamage")).doubleValue() : 50.0;
+        if (weapon == null) {
+            GameLogger.warn("Weapon not found in config: " + weaponId + ", using default damage");
+            return 50.0;
+        }
+
+        Object damage = weapon.get("attackDamage");
+        if (damage instanceof Number) {
+            double value = ((Number) damage).doubleValue();
+            if (value < 0) {
+                GameLogger.warn("Invalid damage value for weapon " + weaponId + ": " + value + ", using default");
+                return 50.0;
+            }
+            return value;
+        } else {
+            GameLogger.warn("Invalid damage type for weapon " + weaponId + ", using default");
+            return 50.0;
+        }
     }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> getEnemyStats(String enemyType) {
-        return (Map<String, Object>) enemiesConfig.get(enemyType);
+        if (enemyType == null || enemyType.trim().isEmpty()) {
+            GameLogger.warn("Enemy type is null or empty");
+            return null;
+        }
+
+        Map<String, Object> enemy = (Map<String, Object>) enemiesConfig.get(enemyType);
+        if (enemy == null) {
+            GameLogger.warn("Enemy type not found in config: " + enemyType);
+        }
+        return enemy;
     }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> getDifficultySettings(String difficulty) {
-        return (Map<String, Object>) difficultyConfig.get(difficulty);
+        if (difficulty == null || difficulty.trim().isEmpty()) {
+            GameLogger.warn("Difficulty is null or empty");
+            return null;
+        }
+
+        Map<String, Object> settings = (Map<String, Object>) difficultyConfig.get(difficulty);
+        if (settings == null) {
+            GameLogger.warn("Difficulty setting not found in config: " + difficulty);
+        }
+        return settings;
     }
 }

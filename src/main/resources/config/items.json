@@ -1,0 +1,48 @@
+{
+  "potions": {
+    "health_potion": {
+      "name": "Health Potion",
+      "healAmount": 50,
+      "description": "Restores 50 health",
+      "rarity": "common",
+      "value": 25
+    },
+    "rage_potion": {
+      "name": "Rage Potion",
+      "duration": 30,
+      "damageMultiplier": 1.5,
+      "description": "Increases damage by 50% for 30 seconds",
+      "rarity": "uncommon",
+      "value": 50
+    }
+  },
+  "weapons": {
+    "sword_0": {
+      "name": "Basic Sword",
+      "damage": 25,
+      "speed": 1.0,
+      "rarity": "common",
+      "value": 30
+    },
+    "sword_1": {
+      "name": "Iron Sword",
+      "damage": 40,
+      "speed": 1.0,
+      "rarity": "common",
+      "value": 60
+    },
+    "bow_0": {
+      "name": "Short Bow",
+      "damage": 20,
+      "speed": 1.5,
+      "rarity": "common",
+      "value": 40
+    }
+  },
+  "gold": {
+    "name": "Gold Coin",
+    "value": 1,
+    "stackable": true,
+    "description": "Main currency in the game"
+  }
+}

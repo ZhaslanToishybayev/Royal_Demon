@@ -1,0 +1,68 @@
+{
+  "golden_sword_0": {
+    "attackDamage": 50,
+    "attackSpeed": 1.2,
+    "criticalChance": 0.05,
+    "description": "Базовый золотой меч"
+  },
+  "golden_sword_1": {
+    "attackDamage": 70,
+    "attackSpeed": 1.1,
+    "criticalChance": 0.08,
+    "description": "Улучшенный золотой меч"
+  },
+  "golden_sword_2": {
+    "attackDamage": 90,
+    "attackSpeed": 1.0,
+    "criticalChance": 0.12,
+    "description": "Мастерский золотой меч"
+  },
+  "magic_staff_0": {
+    "attackDamage": 60,
+    "attackSpeed": 0.9,
+    "criticalChance": 0.03,
+    "description": "Базовый магический посох"
+  },
+  "magic_staff_1": {
+    "attackDamage": 80,
+    "attackSpeed": 0.85,
+    "criticalChance": 0.06,
+    "description": "Улучшенный магический посох"
+  },
+  "magic_staff_2": {
+    "attackDamage": 100,
+    "attackSpeed": 0.8,
+    "criticalChance": 0.10,
+    "description": "Мастерский магический посох"
+  },
+  "bow_0": {
+    "attackDamage": 40,
+    "attackSpeed": 1.5,
+    "criticalChance": 0.04,
+    "description": "Базовый лук"
+  },
+  "bow_1": {
+    "attackDamage": 55,
+    "attackSpeed": 1.4,
+    "criticalChance": 0.07,
+    "description": "Улучшенный лук"
+  },
+  "bow_2": {
+    "attackDamage": 70,
+    "attackSpeed": 1.3,
+    "criticalChance": 0.11,
+    "description": "Мастерский лук"
+  },
+  "heavy_sword": {
+    "attackDamage": 80,
+    "attackSpeed": 0.7,
+    "criticalChance": 0.15,
+    "description": "Тяжелый меч с высоким уроном"
+  },
+  "fireball": {
+    "attackDamage": 45,
+    "attackSpeed": 1.3,
+    "criticalChance": 0.02,
+    "description": "Огненный шар с AE уроном"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "peaceful": {
+    "enemyHealthMultiplier": 0.5,
+    "enemyDamageMultiplier": 0.5,
+    "playerDamageMultiplier": 1.5,
+    "goldMultiplier": 0.8,
+    "experienceMultiplier": 0.7,
+    "description": "Расслабленный режим для новичков"
+  },
+  "easy": {
+    "enemyHealthMultiplier": 0.75,
+    "enemyDamageMultiplier": 0.8,
+    "playerDamageMultiplier": 1.2,
+    "goldMultiplier": 1.0,
+    "experienceMultiplier": 0.9,
+    "description": "Легкий режим для знакомства с игрой"
+  },
+  "normal": {
+    "enemyHealthMultiplier": 1.0,
+    "enemyDamageMultiplier": 1.0,
+    "playerDamageMultiplier": 1.0,
+    "goldMultiplier": 1.0,
+    "experienceMultiplier": 1.0,
+    "description": "Сбалансированный игровой опыт"
+  },
+  "hard": {
+    "enemyHealthMultiplier": 1.5,
+    "enemyDamageMultiplier": 1.3,
+    "playerDamageMultiplier": 0.9,
+    "goldMultiplier": 1.2,
+    "experienceMultiplier": 1.3,
+    "description": "Сложный режим для опытных игроков"
+  },
+  "nightmare": {
+    "enemyHealthMultiplier": 2.0,
+    "enemyDamageMultiplier": 1.5,
+    "playerDamageMultiplier": 0.8,
+    "goldMultiplier": 1.5,
+    "experienceMultiplier": 1.5,
+    "description": "Экстремальная сложность для настоящих мастеров"
+  }
+}

@@ -13,6 +13,7 @@ import uwu.openjfx.RoyalType;
 import uwu.openjfx.behaviors.CanOnlyInteractOnce;
 import uwu.openjfx.components.TrapComponent;
 import uwu.openjfx.utils.GameLogger;
+import uwu.openjfx.i18n.LocalizationManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,13 +45,13 @@ public class GameMap {
     private List<Pair<Pair<Integer, Integer>, String>> directions = new ArrayList<>();
 
     public GameMap(int numOfRooms) {
-        directions.add(new Pair(new Pair(0, 1), "North"));
-        directions.add(new Pair(new Pair(1, 0), "East"));
-        directions.add(new Pair(new Pair(0, -1), "South"));
-        directions.add(new Pair(new Pair(-1, 0), "West"));
+        directions.add(new Pair(new Pair(0, 1), "north"));
+        directions.add(new Pair(new Pair(1, 0), "east"));
+        directions.add(new Pair(new Pair(0, -1), "south"));
+        directions.add(new Pair(new Pair(-1, 0), "west"));
 
         this.numOfRooms = numOfRooms;
-        finalBossDist = 7;
+        finalBossDist = 8; // Увеличиваем до 8 чтобы обеспечить расстояние > 6
 
         if (MainApp.isIsTesting()) {
             random = new Random();
@@ -94,6 +95,7 @@ public class GameMap {
         // generate first room
         initialRoom = new Room(new Coordinate(0, 0), 4);
         rooms.put(initialRoom.getCoordinate(), initialRoom);
+        GameLogger.system("MAP DEBUG: Generated initial room at coordinate (0, 0)");
 
         List<Coordinate> roomsToCreate = new ArrayList<>();
 
@@ -103,9 +105,9 @@ public class GameMap {
             if (!rooms.containsKey(coord)) {
                 Room room = new Room(coord);
                 rooms.put(coord, room);
+                GameLogger.system("MAP DEBUG: Generated " + dir.getValue() + " room at coordinate (" + coord.getX() + ", " + coord.getY() + ")");
                 generateAdjacentRooms(room, roomsToCreate);
                 numRoomsGenerated++;
-                maxDistFromInitRoom = Math.max(maxDistFromInitRoom, room.getDistFromInitRoom());
                 if (room.getDistFromInitRoom() > maxDistFromInitRoom) {
                     maxDistFromInitRoom = room.getDistFromInitRoom();
                     bossRoom = room;
@@ -134,6 +136,7 @@ public class GameMap {
             if (getRoom(coordinate) == null) { // if the coordinate does not have a room yet
                 Room newRoom = new Room(coordinate);
                 rooms.put(coordinate, newRoom);
+                GameLogger.system("MAP DEBUG: Generated additional room at coordinate (" + coordinate.getX() + ", " + coordinate.getY() + "), total rooms: " + numRoomsGenerated);
 
                 maxX = Math.max(maxX, coordinate.getX());
                 minX = Math.min(minX, coordinate.getX());
@@ -141,7 +144,6 @@ public class GameMap {
                 minY = Math.min(minY, coordinate.getY());
 
                 ++numRoomsGenerated;
-                maxDistFromInitRoom = Math.max(maxDistFromInitRoom, newRoom.getDistFromInitRoom());
                 if (newRoom.getDistFromInitRoom() > maxDistFromInitRoom) {
                     maxDistFromInitRoom = newRoom.getDistFromInitRoom();
                     bossRoom = newRoom;
@@ -151,13 +153,25 @@ public class GameMap {
         }
 
         // connect the rooms
+        GameLogger.system("MAP DEBUG: Starting room connection phase for " + rooms.size() + " rooms");
         for (Room room : rooms.values()) {
             connectRoomWithAdjacentRooms(room);
         }
+        GameLogger.system("MAP DEBUG: Room connection phase completed. Final boss room at: " + (bossRoom != null ? bossRoom.getCoordinate().toString() : "null"));
 
 
         initialRoom.setRoomType("initialRoom");
         if (bossRoom != null) {
+            bossRoom.setRoomType("bossRoom");
+        } else {
+            // Если bossRoom не установлен, выбираем комнату с максимальным расстоянием
+            Room farthestRoom = initialRoom;
+            for (Room room : rooms.values()) {
+                if (room.getDistFromInitRoom() > farthestRoom.getDistFromInitRoom()) {
+                    farthestRoom = room;
+                }
+            }
+            bossRoom = farthestRoom;
             bossRoom.setRoomType("bossRoom");
         }
 
@@ -231,34 +245,46 @@ public class GameMap {
 
     public void connectRoomWithAdjacentRooms(Room room) {
         Coordinate coordinate;
-        Coordinate adjacentCoordinate = new Coordinate(0, 0);
         Room adjacentRoom;
+        int connectionsMade = 0;
+
         for (Pair<Pair<Integer, Integer>, String> dir : directions) {
             coordinate = room.getCoordinate();
-            adjacentCoordinate.setX(coordinate.getX() + dir.getKey().getKey());
-            adjacentCoordinate.setY(coordinate.getY() + dir.getKey().getValue());
+            // Create a new Coordinate object for each direction to avoid reuse issues
+            Coordinate adjacentCoordinate = new Coordinate(
+                coordinate.getX() + dir.getKey().getKey(),
+                coordinate.getY() + dir.getKey().getValue()
+            );
             adjacentRoom = rooms.get(adjacentCoordinate);
             if (adjacentRoom != null) {
+                connectionsMade++;
+                GameLogger.system("MAP DEBUG: Connecting room at (" + coordinate.getX() + "," + coordinate.getY() + ") " + dir.getValue() +
+                                " to room at (" + adjacentCoordinate.getX() + "," + adjacentCoordinate.getY() + ")");
                 switch (dir.getValue()) {
-                case "North":
+                case "north":
                     room.setNorthRoom(adjacentRoom);
                     adjacentRoom.setSouthRoom(room);
                     break;
-                case "East":
+                case "east":
                     room.setEastRoom(adjacentRoom);
                     adjacentRoom.setWestRoom(room);
                     break;
-                case "South":
+                case "south":
                     room.setSouthRoom(adjacentRoom);
                     adjacentRoom.setNorthRoom(room);
                     break;
-                case "West":
+                case "west":
                     room.setWestRoom(adjacentRoom);
                     adjacentRoom.setEastRoom(room);
                     break;
                 default:
                 }
             }
+        }
+
+        if (connectionsMade > 0) {
+            GameLogger.system("MAP DEBUG: Room at (" + room.getCoordinate().getX() + "," + room.getCoordinate().getY() +
+                            ") has " + connectionsMade + " connections");
         }
     }
 
@@ -371,5 +397,66 @@ public class GameMap {
 
     public int getMaxY() {
         return maxY;
+    }
+
+    /**
+     * Получение локализованного названия направления
+     */
+    public String getLocalizedDirection(String direction) {
+        LocalizationManager lm = LocalizationManager.getInstance();
+        String key = "direction." + direction.toLowerCase();
+        return lm.getString(key, direction);
+    }
+
+    /**
+     * Получение локализованного названия комнаты
+     */
+    public String getLocalizedRoomName(Room room) {
+        LocalizationManager lm = LocalizationManager.getInstance();
+        String roomType = room.getRoomType();
+        String key = "room.name." + roomType;
+        return lm.getString(key, generateDefaultRoomName(roomType));
+    }
+
+    /**
+     * Генерация названия комнаты по умолчанию
+     */
+    private String generateDefaultRoomName(String roomType) {
+        switch (roomType) {
+            case "initialRoom": return "Entrance Room";
+            case "bossRoom": return "Boss Room";
+            case "challengeRoom": return "Challenge Room";
+            case "treasureRoom": return "Treasure Room";
+            case "shopRoom": return "Shop";
+            case "libraryRoom": return "Library";
+            case "shrineRoom": return "Shrine";
+            default: return "Mysterious Room";
+        }
+    }
+
+    /**
+     * Получение локализованного описания комнаты
+     */
+    public String getLocalizedRoomDescription(Room room) {
+        LocalizationManager lm = LocalizationManager.getInstance();
+        String roomType = room.getRoomType();
+        String key = "room.description." + roomType;
+        return lm.getString(key, generateDefaultRoomDescription(roomType));
+    }
+
+    /**
+     * Генерация описания комнаты по умолчанию
+     */
+    private String generateDefaultRoomDescription(String roomType) {
+        switch (roomType) {
+            case "initialRoom": return "You begin your adventure in this room.";
+            case "bossRoom": return "A fearsome boss awaits you here.";
+            case "challengeRoom": return "This room will test your skills.";
+            case "treasureRoom": return "Treasures may be hidden here.";
+            case "shopRoom": return "A merchant offers their wares.";
+            case "libraryRoom": return "Ancient knowledge rests on these shelves.";
+            case "shrineRoom": return "A holy place for rest and reflection.";
+            default: return "A mysterious room full of secrets.";
+        }
     }
 }

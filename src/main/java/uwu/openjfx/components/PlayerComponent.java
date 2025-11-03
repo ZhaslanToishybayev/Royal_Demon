@@ -1,6 +1,7 @@
 package uwu.openjfx.components;
 
 import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
@@ -13,6 +14,7 @@ import uwu.openjfx.behaviors.GameOverWhenDie;
 import uwu.openjfx.weapons.Weapon;
 import uwu.openjfx.integration.IntegrationHelpers;
 import uwu.openjfx.integration.GameIntegration;
+import uwu.openjfx.utils.GameLogger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,9 +87,9 @@ public class PlayerComponent extends CreatureComponent {
 
     @Override
     public void onAdded() {
-        if (!MainApp.isIsTesting()) {
-            entity.getTransformComponent().setScaleOrigin(new Point2D(20, 25));
-            entity.getViewComponent().addChild(texture);
+        if (!MainApp.isIsTesting() && getEntity() != null) {
+            getEntity().getTransformComponent().setScaleOrigin(new Point2D(20, 25));
+            getEntity().getViewComponent().addChild(texture);
             getEntity().addComponent(new StatusEffectComponent());
             getEntity().addComponent(new ComboManager());
         }
@@ -118,7 +120,7 @@ public class PlayerComponent extends CreatureComponent {
         //endregion
 
         //region Player performs attack
-        if (startAttack) { // Player performs the actual attack
+        if (startAttack && getEntity() != null) { // Player performs the actual attack
             currentWeapon.attack(getEntity(), currMouseX, currMouseY);
             prepAttack = false;
             startAttack = false;
@@ -189,7 +191,10 @@ public class PlayerComponent extends CreatureComponent {
     public void left() {
         if (!prepAttack) {
             if (!isChanneling()) {
-                getEntity().setScaleX(-1);
+                Entity entity = getEntity();
+                if (entity != null) {
+                    entity.setScaleX(-1);
+                }
             }
             physics.setVelocityX(-speed);
         }
@@ -198,7 +203,10 @@ public class PlayerComponent extends CreatureComponent {
     public void right() {
         if (!prepAttack) {
             if (!isChanneling()) {
-                getEntity().setScaleX(1);
+                Entity entity = getEntity();
+                if (entity != null) {
+                    entity.setScaleX(1);
+                }
             }
             physics.setVelocityX(speed);
         }
@@ -222,7 +230,9 @@ public class PlayerComponent extends CreatureComponent {
     }
 
     public void faceRight() {
-        getEntity().setScaleX(1);
+        if (getEntity() != null) {
+            getEntity().setScaleX(1);
+        }
     }
 
     public boolean isPressingMovementKeys() {
@@ -236,12 +246,17 @@ public class PlayerComponent extends CreatureComponent {
 
     // region Player Attack functions
     public void autoAttack(boolean ultimateActivated) {
+        if (currentWeapon == null) {
+            GameLogger.warn("Cannot attack - no weapon equipped");
+            return;
+        }
+
         this.ultimateActivated = ultimateActivated;
-        
+
         // Интеграция с системой комбо
         String attackType = ultimateActivated ? "heavy" : "light";
         IntegrationHelpers.onPlayerAttack(attackType);
-        
+
         if (ultimateActivated) {
             ultimateCD = true;
             Timeline ultimateCooldownTimeline = new Timeline(
@@ -249,21 +264,32 @@ public class PlayerComponent extends CreatureComponent {
             );
             ultimateCooldownTimeline.play();
         }
-        if (currMouseX > entity.getX() + 20) { // turn player in direction of mouse
-            entity.setScaleX(1);
-        } else {
-            entity.setScaleX(-1);
+        if (getEntity() != null) {
+            if (currMouseX > getEntity().getX() + 20) { // turn player in direction of mouse
+                getEntity().setScaleX(1);
+            } else {
+                getEntity().setScaleX(-1);
+            }
         }
-        texture.playAnimationChannel(animWalk); // play attack animation
+        if (!MainApp.isIsTesting() && texture != null && animWalk != null) {
+            texture.playAnimationChannel(animWalk); // play attack animation
+        }
         prepAttack = true; // Player has initiated attack
         stop(); // stop moving
         // Player performs the actual attack after duration amount of milliseconds
-        Timeline attackTimeline = new Timeline(
-            new KeyFrame(javafx.util.Duration.millis(currentWeapon.getDuration(ultimateActivated)), e -> startAttack = true)
-        );
-        attackTimeline.play();
-        currentWeapon.getDuration(ultimateActivated);
-        currentWeapon.prepAttack(getEntity());
+        try {
+            Timeline attackTimeline = new Timeline(
+                new KeyFrame(javafx.util.Duration.millis(currentWeapon.getDuration(ultimateActivated)), e -> startAttack = true)
+            );
+            attackTimeline.play();
+            currentWeapon.getDuration(ultimateActivated);
+            if (getEntity() != null) {
+                currentWeapon.prepAttack(getEntity());
+            }
+        } catch (Exception e) {
+            GameLogger.error("Error during attack execution: " + e.getMessage(), e);
+            prepAttack = false; // Reset attack state on error
+        }
     }
 
     public static void channelAttack() {

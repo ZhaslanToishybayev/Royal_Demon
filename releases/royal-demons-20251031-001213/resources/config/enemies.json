@@ -1,0 +1,77 @@
+{
+  "minion": {
+    "health": 60,
+    "damage": 1,
+    "speed": 70,
+    "experienceReward": 15,
+    "goldReward": {
+      "min": 1,
+      "max": 5
+    },
+    "dropChance": {
+      "potion": 0.15,
+      "gold": 0.80,
+      "weapon": 0.05
+    }
+  },
+  "elite_minion": {
+    "health": 100,
+    "damage": 2,
+    "speed": 100,
+    "experienceReward": 30,
+    "goldReward": {
+      "min": 5,
+      "max": 15
+    },
+    "dropChance": {
+      "potion": 0.25,
+      "gold": 0.70,
+      "weapon": 0.15
+    }
+  },
+  "mini_boss": {
+    "health": 300,
+    "damage": 5,
+    "speed": 50,
+    "experienceReward": 150,
+    "goldReward": {
+      "min": 20,
+      "max": 50
+    },
+    "dropChance": {
+      "potion": 0.40,
+      "gold": 0.50,
+      "weapon": 0.30
+    }
+  },
+  "final_boss": {
+    "health": 1000,
+    "damage": 10,
+    "speed": 80,
+    "experienceReward": 1000,
+    "goldReward": {
+      "min": 100,
+      "max": 200
+    },
+    "dropChance": {
+      "potion": 0.60,
+      "gold": 0.30,
+      "weapon": 0.50
+    }
+  },
+  "forest_minion": {
+    "health": 80,
+    "damage": 1,
+    "speed": 85,
+    "experienceReward": 20,
+    "goldReward": {
+      "min": 3,
+      "max": 8
+    },
+    "dropChance": {
+      "potion": 0.20,
+      "gold": 0.75,
+      "weapon": 0.08
+    }
+  }
+}

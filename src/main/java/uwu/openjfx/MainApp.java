@@ -16,6 +16,7 @@ import uwu.openjfx.map.GameMap;
 import uwu.openjfx.behaviors.Interactable;
 import uwu.openjfx.collision.*;
 import uwu.openjfx.components.PlayerComponent;
+import uwu.openjfx.components.PlayerManager;
 import uwu.openjfx.events.InteractEvent;
 import uwu.openjfx.input.*;
 import uwu.openjfx.items.Heart;
@@ -36,6 +37,10 @@ import static com.almasb.fxgl.dsl.FXGL.getAppHeight;
 import static com.almasb.fxgl.dsl.FXGLForKtKt.*;
 
 public class MainApp extends GameApplication {
+
+    // Constants - используем централизованные константы
+    public static final int DEFAULT_WINDOW_WIDTH = (int) GameConstants.UI.WINDOW_WIDTH;
+    public static final int DEFAULT_WINDOW_HEIGHT = (int) GameConstants.UI.WINDOW_HEIGHT;
 
     private Entity player;
     private PlayerComponent playerComponent;
@@ -68,10 +73,10 @@ public class MainApp extends GameApplication {
 
     @Override
     protected void initSettings(GameSettings settings) {
-        settings.setWidth(960);
-        settings.setHeight(640);
+        settings.setWidth(DEFAULT_WINDOW_WIDTH);
+        settings.setHeight(DEFAULT_WINDOW_HEIGHT);
         settings.setTitle("Royal Demons");
-        settings.setVersion("0.1");
+        settings.setVersion("1.0");
         settings.setAppIcon("ui/weapon_box_ui.png");
         settings.setFontUI("ThaleahFat.ttf");
         settings.setMainMenuEnabled(true);
@@ -79,6 +84,8 @@ public class MainApp extends GameApplication {
         settings.setSceneFactory(new MainMenuSceneFactory());
         settings.setGameMenuEnabled(true);
         settings.setEnabledMenuItems(EnumSet.of(MenuItem.EXTRA));
+        // Улучшенная обработка ошибок
+        settings.setProfilingEnabled(false);
         //settings.setDeveloperMenuEnabled(true);
         //settings.setApplicationMode(ApplicationMode.DEVELOPER);
     }
@@ -92,7 +99,11 @@ public class MainApp extends GameApplication {
 
         getEventBus().addEventHandler(InteractEvent.ANY, event -> {
             Interactable interactable = event.getEntity().getObject("Interactable");
-            interactable.interact();
+            if (interactable != null) {
+                interactable.interact();
+            } else {
+                GameLogger.warn("Interactable is null for entity: " + event.getEntity());
+            }
         });
     }
 
@@ -427,6 +438,20 @@ public class MainApp extends GameApplication {
     }
 
     public static void main(String[] args) {
+        // Проверяем, нужно ли запустить тестирование
+        if (args.length > 0 && args[0].equals("QuickTest")) {
+            System.out.println("🧪 Запуск QuickTest в режиме standalone...");
+            try {
+                uwu.openjfx.utils.QuickTest.main(new String[]{});
+                return;
+            } catch (Exception e) {
+                System.err.println("❌ Ошибка при запуске QuickTest: " + e.getMessage());
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        // Стандартный запуск игры
         launch(args);
     }
 }
