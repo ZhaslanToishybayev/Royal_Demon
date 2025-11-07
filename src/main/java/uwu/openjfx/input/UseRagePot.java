@@ -1,7 +1,7 @@
 package uwu.openjfx.input;
 
 import com.almasb.fxgl.input.UserAction;
-import uwu.openjfx.UI;
+import uwu.openjfx.hud.ModernGameHUD;
 
 public class UseRagePot extends UserAction {
     public UseRagePot(String useRagePot) {
@@ -10,6 +10,6 @@ public class UseRagePot extends UserAction {
 
     @Override
     protected void onActionBegin() {
-        UI.useRagePot();
+        ModernGameHUD.useRagePot();
     }
 }

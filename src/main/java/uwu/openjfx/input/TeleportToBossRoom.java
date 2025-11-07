@@ -4,7 +4,7 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.input.UserAction;
 import uwu.openjfx.map.GameMap;
 import uwu.openjfx.map.Room;
-import uwu.openjfx.UI;
+import uwu.openjfx.hud.ModernGameHUD;
 
 import static com.almasb.fxgl.dsl.FXGLForKtKt.getGameScene;
 
@@ -21,7 +21,7 @@ public class TeleportToBossRoom extends UserAction {
         }
         getGameScene().getViewport().fade(() -> {
             gameMap.loadRoom(gameMap.getBossRoom(), "west");
-            UI.initBossCutsceneAndUI();
+            ModernGameHUD.initBossCutsceneAndUI();
         });
     }
 

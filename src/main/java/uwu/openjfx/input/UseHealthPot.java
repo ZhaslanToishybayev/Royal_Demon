@@ -1,7 +1,7 @@
 package uwu.openjfx.input;
 
 import com.almasb.fxgl.input.UserAction;
-import uwu.openjfx.UI;
+import uwu.openjfx.hud.ModernGameHUD;
 
 public class UseHealthPot extends UserAction {
     public UseHealthPot(String useHealthPot) {
@@ -10,6 +10,6 @@ public class UseHealthPot extends UserAction {
 
     @Override
     protected void onActionBegin() {
-        UI.useHealthPot();
+        ModernGameHUD.useHealthPot();
     }
 }

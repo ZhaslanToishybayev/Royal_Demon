@@ -14,6 +14,8 @@ import uwu.openjfx.behaviors.GameOverWhenDie;
 import uwu.openjfx.weapons.Weapon;
 import uwu.openjfx.integration.IntegrationHelpers;
 import uwu.openjfx.integration.GameIntegration;
+import uwu.openjfx.leaderboard.LeaderboardManager;
+import uwu.openjfx.progression.SimpleProgression;
 import uwu.openjfx.utils.GameLogger;
 
 import java.util.ArrayList;
@@ -92,6 +94,9 @@ public class PlayerComponent extends CreatureComponent {
             getEntity().getViewComponent().addChild(texture);
             getEntity().addComponent(new StatusEffectComponent());
             getEntity().addComponent(new ComboManager());
+
+            // Запускаем периодическое обновление таблицы лидеров
+            startLeaderboardUpdateTimer();
         }
     }
 
@@ -344,9 +349,9 @@ public class PlayerComponent extends CreatureComponent {
     public static void setCurrentWeapon(Weapon weapon) {
         currentWeapon = weapon;
         if (weapon != null) {
-            UI.setWeaponProperty(currentWeapon.getWeaponSprite());
+            uwu.openjfx.hud.ModernGameHUD.setWeaponProperty(currentWeapon.getWeaponSprite());
         } else {
-            UI.setWeaponProperty(FXGL.texture("ui/transparent.png").getImage());
+            uwu.openjfx.hud.ModernGameHUD.setWeaponProperty(FXGL.texture("ui/transparent.png").getImage());
         }
     }
 
@@ -374,36 +379,101 @@ public class PlayerComponent extends CreatureComponent {
 
     // region Gold
     public static void addGold(int gold) {
-        // Используем FXGL.getip("coin") для синхронизации с UI
-        int currentGold = 0;
         try {
-            currentGold = FXGL.geti("coin");
+            // Используем FXGL.getip("coin") для синхронизации с UI
+            int currentGold = 0;
+            try {
+                currentGold = FXGL.geti("coin");
+            } catch (Exception e) {
+                // Если не удалось получить, используем статическое поле
+                currentGold = PlayerComponent.gold;
+            }
+
+            int newGold = currentGold + gold;
+
+            PlayerComponent.gold = newGold;
+
+            // Обновляем FXGL переменную (синхронизация с UI)
+            FXGL.set("coin", newGold);
+
+            // Синхронизация с ModernGameHUD
+            try {
+                uwu.openjfx.hud.ModernGameHUD.setGoldProperty(newGold);
+            } catch (Exception e) {
+                // Игнорируем ошибки, если HUD не инициализирован
+            }
+
+            // Обновляем таблицу лидеров
+            updateLeaderboard();
+
+            // Проверяем достижения при получении золота
+            try {
+                uwu.openjfx.achievements.SimpleAchievements.getInstance().checkAchievements();
+            } catch (Exception e) {
+                // Игнорируем ошибки, если система достижений не инициализирована
+            }
         } catch (Exception e) {
-            // Если не удалось получить, используем статическое поле
-            currentGold = PlayerComponent.gold;
-        }
-
-        int newGold = currentGold + gold;
-        PlayerComponent.gold = newGold;
-
-        // Обновляем FXGL переменную (синхронизация с UI)
-        FXGL.set("coin", newGold);
-
-        // Проверяем достижения при получении золота
-        try {
-            uwu.openjfx.achievements.SimpleAchievements.getInstance().checkAchievements();
-        } catch (Exception e) {
-            // Игнорируем ошибки, если система достижений не инициализирована
+            System.err.println("❌ КРИТИЧЕСКАЯ ОШИБКА в addGold(): " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     public static void setGold(int gold) {
+        System.out.println("💰 Устанавливаем монеты: " + PlayerComponent.gold + " → " + gold);
         PlayerComponent.gold = gold;
         FXGL.set("coin", gold); // Синхронизация с FXGL и UI
+
+        // Синхронизация с ModernGameHUD
+        try {
+            uwu.openjfx.hud.ModernGameHUD.setGoldProperty(gold);
+        } catch (Exception e) {
+            // Игнорируем ошибки, если HUD не инициализирован
+        }
+
+        // Обновляем таблицу лидеров
+        updateLeaderboard();
     }
 
     public static int getGold() {
         return gold;
+    }
+
+    /**
+     * Обновить запись в таблице лидеров
+     */
+    private static void updateLeaderboard() {
+        try {
+            String playerName = getPlayerName() != null ? getPlayerName() : "Игрок";
+            int currentGold = getGold();
+            int playerLevel = SimpleProgression.getInstance().getLevel();
+
+            // Используем текущее время в секундах как время игры
+            // В реальной игре здесь может быть таймер сессии
+            long playTimeSeconds = System.currentTimeMillis() / 1000;
+
+            LeaderboardManager.getInstance().updatePlayerEntry(playerName, currentGold, playerLevel, playTimeSeconds);
+        } catch (Exception e) {
+            GameLogger.warn("Не удалось обновить таблицу лидеров: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Запустить периодическое обновление таблицы лидеров
+     */
+    private void startLeaderboardUpdateTimer() {
+        try {
+            // Обновляем каждые 5 секунд
+            FXGL.getGameTimer().runAtInterval(() -> {
+                // Обновляем только если игрок набрал монеты
+                if (getGold() > 0) {
+                    updateLeaderboard();
+                }
+            }, Duration.seconds(5.0));
+
+            System.out.println("🔄 Таймер обновления таблицы лидеров запущен (каждые 5 секунд)");
+        } catch (Exception e) {
+            System.err.println("❌ Ошибка запуска таймера таблицы лидеров: " + e.getMessage());
+        }
     }
     // endregion
 

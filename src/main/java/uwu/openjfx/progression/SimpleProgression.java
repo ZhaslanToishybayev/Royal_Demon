@@ -54,20 +54,24 @@ public class SimpleProgression {
     }
 
     public void addExperience(int amount) {
-        experience.set(experience.get() + amount);
+        int oldExp = experience.get();
+        experience.set(oldExp + amount);
+        System.out.println("➕ Добавлено опыта: " + amount + " (было: " + oldExp + ", стало: " + experience.get() + ")");
         checkLevelUp();
     }
 
     private void checkLevelUp() {
         int currentLevel = level.get();
         int currentExperience = experience.get();
-
-        // Улучшенная формула: требуется больше опыта на каждом уровне
         int experienceNeeded = getExperienceNeededForLevel(currentLevel + 1);
+
+        System.out.println("📊 DEBUG: Текущий уровень: " + currentLevel + ", Текущий опыт: " + currentExperience + ", Нужно для уровня " + (currentLevel + 1) + ": " + experienceNeeded);
 
         if (currentExperience >= experienceNeeded) {
             level.set(currentLevel + 1);
             experience.set(0); // Сброс опыта при повышении уровня
+
+            System.out.println("🎉 Повышение уровня! Новый уровень: " + (currentLevel + 1) + ", Опыт сброшен на 0");
 
             if (FXGL.getApp() != null && !isTesting) {
                 FXGL.play("level_up.wav"); // Звук повышения уровня
@@ -80,11 +84,11 @@ public class SimpleProgression {
 
     /**
      * Calculate experience needed for a specific level
-     * Uses exponential scaling for balanced progression
+     * Simple linear scaling for balanced progression
      */
     private int getExperienceNeededForLevel(int targetLevel) {
-        // Exponential growth: 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700, 3250...
-        return (targetLevel - 1) * 100 + (targetLevel - 1) * (targetLevel - 1) * 50;
+        // Simple linear growth: Level 2 needs 100, Level 3 needs 200, Level 4 needs 300...
+        return (targetLevel - 1) * 100;
     }
 
     /**

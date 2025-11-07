@@ -7,7 +7,7 @@ import com.almasb.fxgl.physics.CollisionHandler;
 import uwu.openjfx.MainApp;
 import uwu.openjfx.map.Room;
 import uwu.openjfx.RoyalType;
-import uwu.openjfx.UI;
+import uwu.openjfx.hud.ModernGameHUD;
 import uwu.openjfx.components.PlayerComponent;
 import uwu.openjfx.items.Item;
 import uwu.openjfx.weapons.*;
@@ -32,9 +32,9 @@ public class PlayerDroppedItemCollisionHandler extends CollisionHandler {
             // This is a huge piece of shit !!!!!
             // add things to inventory
             if (itemName.equals("HealthPotion")) {
-                UI.addHealthPot();
+                ModernGameHUD.addHealthPot();
             } else if (itemName.equals("RagePotion")) {
-                UI.addRagePot();
+                ModernGameHUD.addRagePot();
             } else if (itemName.equals("Heart")) {
                 GameLogger.gameplay("Grabbed Heart");
             } else {

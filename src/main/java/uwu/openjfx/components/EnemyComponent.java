@@ -944,11 +944,12 @@ public class EnemyComponent extends CreatureComponent {
             try {
                 int experience = type.equals("finalboss") ? 100 :
                                  type.equals("miniboss") ? 50 : 25;
-                
+
                 int damage = fighterClass.equals("melee") ? 20 : 15;
                 if (type.equals("miniboss")) damage = 35;
                 if (type.equals("finalboss")) damage = 50;
-                
+
+                System.out.println("☠️ Враг умирает! Вызываем onEnemyDefeated...");
                 GameIntegration.onEnemyDefeated(
                     damage,
                     experience,
@@ -956,6 +957,8 @@ public class EnemyComponent extends CreatureComponent {
                     false
                 );
             } catch (Exception e) {
+                System.err.println("❌ Ошибка при обработке смерти врага: " + e.getMessage());
+                e.printStackTrace();
             }
 
             // Check for challenge room completion

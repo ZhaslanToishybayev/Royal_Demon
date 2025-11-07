@@ -18,8 +18,10 @@ fi
 echo "Starting Royal Demons..."
 echo
 
-# Запускаем игру
-java -jar build/libs/royal-demons.jar
+# Запускаем игру с JavaFX модулями
+java --add-opens=javafx.controls/javafx.scene=ALL-UNNAMED \
+     --add-opens=javafx.graphics/javafx.stage=ALL-UNNAMED \
+     -jar build/libs/royal-demons.jar
 
 if [ $? -ne 0 ]; then
     echo

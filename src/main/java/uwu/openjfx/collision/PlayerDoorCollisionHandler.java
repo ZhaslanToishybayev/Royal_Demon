@@ -10,7 +10,7 @@ import uwu.openjfx.map.Room;
 import uwu.openjfx.RoyalType;
 import uwu.openjfx.UI;
 import uwu.openjfx.components.PlayerComponent;
-import uwu.openjfx.hud.GameHUD;
+import uwu.openjfx.hud.ModernGameHUD;
 import uwu.openjfx.input.TeleportToBossRoom;
 
 import static com.almasb.fxgl.dsl.FXGLForKtKt.getGameScene;
@@ -39,7 +39,7 @@ public class PlayerDoorCollisionHandler extends CollisionHandler {
                 // UI.init() конфликтовал с GameHUD, создавая дублирующие системы HP
                 Entity playerEntity = FXGL.geto("player");
                 if (playerEntity != null) {
-                    new GameHUD(playerEntity).initUI();
+                    ModernGameHUD.init(playerEntity);
                 }
                 getInput().setProcessInput(true);
             });

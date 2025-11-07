@@ -17,7 +17,11 @@ public class IncreaseMaxHealth implements Behavior {
         // Add safe check to prevent errors when entity doesn't have CreatureComponent
         if (entity != null && entity.hasComponent(CreatureComponent.class)) {
             CreatureComponent creatureComponent = entity.getComponent(CreatureComponent.class);
+            // Увеличиваем максимальное HP
             creatureComponent.setMaxHealthPoints(creatureComponent.getMaxHealthPoints() + healPoints);
+            // Увеличиваем текущее HP (восстановление)
+            creatureComponent.increaseHealth(healPoints);
+            System.out.println("❤️ Получено сердце! +" + healPoints + " HP (Макс: " + creatureComponent.getMaxHealthPoints() + ")");
         }
     }
 }

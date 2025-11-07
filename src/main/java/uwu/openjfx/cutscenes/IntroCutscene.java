@@ -74,8 +74,8 @@ public class IntroCutscene extends Cutscene {
      */
     private void setupContent() {
         // Создаем текстовые элементы
-        titleText = new LocalizedText("cutscene.intro.title", Color.GOLD, 48.0);
-        titleText.setFont(Font.font("Arial Bold", 48.0));
+        titleText = new LocalizedText("cutscene.intro.title", Color.GOLD, 36.0);
+        titleText.setFont(Font.font("Arial Bold", 36.0));
         titleText.setStroke(Color.BLACK);
         titleText.setStrokeWidth(2.0);
 

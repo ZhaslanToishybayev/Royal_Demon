@@ -3,6 +3,7 @@ package uwu.openjfx.integration;
 import com.almasb.fxgl.dsl.FXGL;
 import uwu.openjfx.achievements.SimpleAchievements;
 import uwu.openjfx.combo.SimpleComboSystem;
+import uwu.openjfx.components.PlayerComponent;
 import uwu.openjfx.i18n.EnhancedLocalizationManager;
 import uwu.openjfx.progression.SimpleProgression;
 import uwu.openjfx.visual.CleanDamageNumbers;
@@ -115,24 +116,69 @@ public class GameIntegration {
      */
     public static void onEnemyDefeated(int damage, int experience,
                                       javafx.geometry.Point2D position, boolean critical) {
-        if (FXGL.getApp() != null) {
-            // Увеличиваем счетчик убийств
-            try {
-                int currentKills = FXGL.geti("killsCount");
-                FXGL.set("killsCount", currentKills + 1);
-            } catch (Exception e) {
-                FXGL.set("killsCount", 1);
+        try {
+            if (FXGL.getApp() != null) {
+                // Увеличиваем счетчик убийств
+                try {
+                    int currentKills = FXGL.geti("killsCount");
+                    FXGL.set("killsCount", currentKills + 1);
+                } catch (Exception e) {
+                    FXGL.set("killsCount", 1);
+                }
             }
+
+            // Добавляем монеты при убийстве врага
+            int goldReward = calculateGoldReward(damage, experience);
+            PlayerComponent.addGold(goldReward);
+            System.out.println("💰 Получено " + goldReward + " монет за убийство врага!");
+
+            // Добавляем опыт
+            try {
+                System.out.println("⚔️ Добавляем опыт за врага: " + experience);
+                SimpleProgression.getInstance().addExperience(experience);
+            } catch (Exception e) {
+                // Игнорируем ошибки, если система прогрессии не инициализирована
+                System.err.println("❌ Ошибка при добавлении опыта: " + e.getMessage());
+            }
+
+            // Показываем числа урона
+            try {
+                CleanDamageNumbers.showDamageNumber(damage, position, critical);
+            } catch (Exception e) {
+                // Игнорируем ошибки показа урона
+            }
+
+            // Проверяем достижения
+            try {
+                SimpleAchievements.getInstance().checkAchievements();
+            } catch (Exception e) {
+                // Игнорируем ошибки системы достижений
+            }
+        } catch (Exception e) {
+            System.err.println("❌ КРИТИЧЕСКАЯ ОШИБКА в onEnemyDefeated: " + e.getMessage());
+            e.printStackTrace();
         }
-        
-        // Добавляем опыт
-        SimpleProgression.getInstance().addExperience(experience);
-        
-        // Показываем числа урона
-        CleanDamageNumbers.showDamageNumber(damage, position, critical);
-        
-        // Проверяем достижения
-        SimpleAchievements.getInstance().checkAchievements();
+    }
+
+    /**
+     * Вычислить награду в монетах за убийство врага
+     */
+    private static int calculateGoldReward(int damage, int experience) {
+        // Базовое количество монет = опыт / 5 (минимум 5, максимум 50)
+        int baseGold = Math.max(5, Math.min(50, experience / 5));
+
+        // Бонус за урон (каждые 10 урона = +1 монета)
+        int damageBonus = damage / 10;
+
+        // Случайный бонус от 0 до 5
+        int randomBonus = (int) (Math.random() * 6);
+
+        int totalGold = baseGold + damageBonus + randomBonus;
+
+        System.out.println("💰 Награда: " + totalGold + " монет (база:" + baseGold +
+                          ", урон:" + damageBonus + ", случайный:" + randomBonus + ")");
+
+        return totalGold;
     }
     
     /**

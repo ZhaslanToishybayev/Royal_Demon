@@ -6,6 +6,11 @@ import com.almasb.fxgl.input.UserAction;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import uwu.openjfx.components.PlayerComponent;
+import uwu.openjfx.utils.GameLogger;
+
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Содержит все игровые input действия для рефакторинга MainApp
@@ -15,15 +20,54 @@ public class GameInputActions {
     private static boolean actionsRegistered = false;
     
     public static void registerAllActions(Entity player) {
-        if (actionsRegistered) {
-            return;
+        synchronized (GameInputActions.class) {
+            if (actionsRegistered) {
+                GameLogger.gameplay("Input actions already registered, skipping");
+                return;
+            }
+
+            // Принудительно очищаем FXGL input actions перед регистрацией
+            // Это необходимо для корректного перезапуска игры
+            clearFXGLActions();
+
+            PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
+            registerMovementActions(playerComponent);
+            registerCombatActions(playerComponent);
+            registerInventoryActions();
+            registerUtilityActions();
+            actionsRegistered = true;
+            GameLogger.gameplay("All input actions registered successfully");
         }
-        PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
-        registerMovementActions(playerComponent);
-        registerCombatActions(playerComponent);
-        registerInventoryActions();
-        registerUtilityActions();
-        actionsRegistered = true;
+    }
+
+    /**
+     * Принудительно очищает все input actions в FXGL через reflection
+     */
+    private static void clearFXGLActions() {
+        try {
+            Object input = FXGL.getInput();
+            Class<?> inputClass = input.getClass();
+
+            // Ищем поле с actions (может называться по-разному)
+            Field actionsField = null;
+            for (Field field : inputClass.getDeclaredFields()) {
+                field.setAccessible(true);
+                Object value = field.get(input);
+                if (value instanceof Map) {
+                    actionsField = field;
+                    break;
+                }
+            }
+
+            if (actionsField != null) {
+                @SuppressWarnings("unchecked")
+                Map<Object, Object> actions = (Map<Object, Object>) actionsField.get(input);
+                actions.clear();
+                GameLogger.gameplay("FXGL input actions cleared via reflection");
+            }
+        } catch (Exception e) {
+            GameLogger.warn("Failed to clear FXGL input actions via reflection: " + e.getMessage());
+        }
     }
     
     private static void registerMovementActions(PlayerComponent playerComponent) {
@@ -133,11 +177,21 @@ public class GameInputActions {
     private static void registerUtilityActions() {
         // Показать карту
         FXGL.getInput().addAction(new ShowMapAction("showMap"), KeyCode.M);
-        
+
         // Показать инвентарь
         FXGL.getInput().addAction(new ShowInventoryAction("showInventory"), KeyCode.I);
-        
+
         // Телепорт в showcase комнату
         FXGL.getInput().addAction(new TeleportToShowcaseRoom("teleportToShowcaseRoom"), KeyCode.P);
+    }
+
+    /**
+     * Сбросить флаг регистрации действий для корректного перезапуска игры
+     */
+    public static void resetActionsRegistration() {
+        synchronized (GameInputActions.class) {
+            actionsRegistered = false;
+            GameLogger.gameplay("Input actions registration flag reset");
+        }
     }
 }

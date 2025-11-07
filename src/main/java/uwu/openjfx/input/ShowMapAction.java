@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import uwu.openjfx.map.Coordinate;
 import uwu.openjfx.map.GameMap;
 import uwu.openjfx.map.Room;
-import uwu.openjfx.UI;
+import uwu.openjfx.hud.ModernGameHUD;
 
 import static com.almasb.fxgl.dsl.FXGLForKtKt.getInput;
 import static com.almasb.fxgl.dsl.FXGLForKtKt.getUIFactoryService;
@@ -152,7 +152,7 @@ public class ShowMapAction extends UserAction {
                                 getInput().setProcessInput(true);
                                 if (room.getCoordinate().equals(
                                         gameMap.getBossRoom().getCoordinate())) {
-                                    UI.initBossCutsceneAndUI();
+                                    ModernGameHUD.initBossCutsceneAndUI();
                                 }
                             });
                         }

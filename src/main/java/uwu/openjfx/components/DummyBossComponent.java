@@ -1,3 +1,4 @@
+
 package uwu.openjfx.components;
 
 public class DummyBossComponent extends BossComponent {

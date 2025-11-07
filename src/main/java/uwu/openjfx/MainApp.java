@@ -27,7 +27,7 @@ import uwu.openjfx.core.modules.AssetModule;
 import uwu.openjfx.weapons.*;
 import uwu.openjfx.integration.GameIntegration;
 import uwu.openjfx.i18n.LocalizationManager;
-import uwu.openjfx.hud.GameHUD;
+import uwu.openjfx.hud.ModernGameHUD;
 import uwu.openjfx.utils.GameLogger;
 
 import java.io.File;
@@ -112,13 +112,16 @@ public class MainApp extends GameApplication {
         if (developerCheat) {
             getInput().addAction(new KillAllEnemy("KillAll"), KeyCode.K);
             getInput().addAction(new TeleportToBossRoom("TeleportToBossRoom"), KeyCode.B);
-            UI.ragePotProperty().set(5);
+            ModernGameHUD.setRagePotProperty(5);
         }
 
     }
 
     @Override
     protected void initGame() {
+        // Сбрасываем флаг регистрации input действий для корректного перезапуска
+        GameInputActions.resetActionsRegistration();
+
         // Инициализируем модульную архитектуру
         initializeModules();
 
@@ -143,19 +146,19 @@ public class MainApp extends GameApplication {
                 GoldenSword0 goldenSword0 = new GoldenSword0();
                 PlayerComponent.setCurrentWeapon(goldenSword0);
                 PlayerComponent.addWeaponToInventory(goldenSword0);
-                PlayerComponent.setGold(1000);
+                PlayerComponent.setGold(0);
                 break;
             case 1:
                 GoldenSword1 goldenSword1 = new GoldenSword1();
                 PlayerComponent.setCurrentWeapon(goldenSword1);
                 PlayerComponent.addWeaponToInventory(goldenSword1);
-                PlayerComponent.setGold(1000);
+                PlayerComponent.setGold(0);
                 break;
             case 2:
                 GoldenSword2 goldenSword2 = new GoldenSword2();
                 PlayerComponent.setCurrentWeapon(goldenSword2);
                 PlayerComponent.addWeaponToInventory(goldenSword2);
-                PlayerComponent.setGold(1000);
+                PlayerComponent.setGold(0);
                 break;
             case 3:
                 Bow0 bow0 = new Bow0();
@@ -246,6 +249,9 @@ public class MainApp extends GameApplication {
         try {
             GameLogger.system("=== Initializing Modular Architecture ===");
 
+            // Сбрасываем состояние перед инициализацией (для перезапуска игры)
+            ModuleManager.reset();
+
             // Регистрируем базовые модули
             ModuleManager moduleManager = ModuleManager.getInstance();
             moduleManager.registerModule(new CoreModule());
@@ -334,7 +340,7 @@ public class MainApp extends GameApplication {
 
     @Override
     protected void initUI() {
-        new GameHUD(player).initUI();
+        ModernGameHUD.init(player);
     }
 
 

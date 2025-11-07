@@ -215,7 +215,11 @@ public class UI {
 
     public static void addHealthPot() {
         if (healthPotProperty.get() < 3) {
-            healthPotProperty.set(healthPotProperty.get() + 1);
+            int oldCount = healthPotProperty.get();
+            healthPotProperty.set(oldCount + 1);
+            System.out.println("💚 Добавлено зелье здоровья! Инвентарь: " + oldCount + " → " + healthPotProperty.get());
+        } else {
+            System.out.println("⚠️ Инвентарь зелий здоровья полон (максимум 3)");
         }
     }
 
@@ -225,28 +229,53 @@ public class UI {
             return;
         }
         PlayerComponent component = player.getComponent(PlayerComponent.class);
-        if (component.getHealthPoints() < component.getMaxHealthPoints()) {
-            healthPotProperty.set(healthPotProperty.get() - 1);
-            component.increaseHealth(5); // 5 HP за зелье (1 сердце)
-            if (!MainApp.isIsTesting()) {
-                FXGL.play("ui/pot.wav");
-            }
+
+        if (healthPotProperty.get() <= 0) {
+            System.out.println("❌ Нет зелий здоровья!");
+            return;
+        }
+
+        if (component.getHealthPoints() >= component.getMaxHealthPoints()) {
+            System.out.println("⚠️ Здоровье уже полное!");
+            return;
+        }
+
+        int oldHealth = component.getHealthPoints();
+        healthPotProperty.set(healthPotProperty.get() - 1);
+        component.increaseHealth(5); // 5 HP за зелье (1 сердце)
+        int newHealth = component.getHealthPoints();
+
+        System.out.println("💚 Использовано зелье здоровья! HP: " + oldHealth + " → " + newHealth +
+                          " | В инвентаре: " + healthPotProperty.get());
+
+        if (!MainApp.isIsTesting()) {
+            FXGL.play("ui/pot.wav");
         }
     }
 
     public static void addRagePot() {
         if (ragePotProperty.get() < 3) {
-            ragePotProperty.set(ragePotProperty.get() + 1);
+            int oldCount = ragePotProperty.get();
+            ragePotProperty.set(oldCount + 1);
+            System.out.println("💜 Добавлено зелье ярости! Инвентарь: " + oldCount + " → " + ragePotProperty.get());
+        } else {
+            System.out.println("⚠️ Инвентарь зелий ярости полон (максимум 3)");
         }
     }
 
     public static void useRagePot() {
-        if (ragePotProperty.get() > 0) {
-            ragePotProperty.set(ragePotProperty.get() - 1);
-            PlayerComponent.setIsAttackPowerBuffed(true);
-            if (!MainApp.isIsTesting()) {
-                FXGL.play("ui/pot2.wav");
-            }
+        if (ragePotProperty.get() <= 0) {
+            System.out.println("❌ Нет зелий ярости!");
+            return;
+        }
+
+        ragePotProperty.set(ragePotProperty.get() - 1);
+        PlayerComponent.setIsAttackPowerBuffed(true);
+
+        System.out.println("💜 Использовано зелье ярости! Бафф атаки активирован | В инвентаре: " + ragePotProperty.get());
+
+        if (!MainApp.isIsTesting()) {
+            FXGL.play("ui/pot2.wav");
         }
     }
 }

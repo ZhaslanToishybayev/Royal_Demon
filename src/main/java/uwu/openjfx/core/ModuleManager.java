@@ -19,11 +19,21 @@ public class ModuleManager {
 
     private ModuleManager() {}
 
-    public static ModuleManager getInstance() {
+    public static synchronized ModuleManager getInstance() {
         if (instance == null) {
             instance = new ModuleManager();
         }
         return instance;
+    }
+
+    /**
+     * Сбросить состояние менеджера (для перезапуска игры)
+     */
+    public static synchronized void reset() {
+        if (instance != null) {
+            instance.shutdownAll();
+            instance = null;
+        }
     }
 
     /**

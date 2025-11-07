@@ -77,10 +77,10 @@ public class ConfigManager {
         try {
             // Проверяем существование файла
             if (!Files.exists(configPath)) {
-                GameLogger.warning("ConfigManager", "Config file not found: " + configPath);
-                // Создаем конфигурацию по умолчанию
+                // Создаем конфигурацию по умолчанию (без warning для первого запуска)
                 T defaultConfig = createDefaultConfig(clazz);
                 saveConfig(configName, defaultConfig, format);
+                GameLogger.debug("ConfigManager", "Created default config: " + configPath);
                 return defaultConfig;
             }
 

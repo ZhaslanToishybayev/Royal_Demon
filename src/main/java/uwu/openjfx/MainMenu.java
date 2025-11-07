@@ -39,6 +39,8 @@ import org.jetbrains.annotations.NotNull;
 import uwu.openjfx.components.PlayerComponent;
 import uwu.openjfx.core.GameEnvironment;
 import uwu.openjfx.i18n.EnhancedLocalizationManager;
+import uwu.openjfx.input.GameInputActions;
+import uwu.openjfx.leaderboard.LeaderboardUI;
 import uwu.openjfx.weapons.Bow0;
 import uwu.openjfx.weapons.GoldenSword1;
 import uwu.openjfx.weapons.MagicStaff0;
@@ -128,6 +130,9 @@ public class MainMenu extends FXGLMenu {
         FXGL.getAudioPlayer().stopAllMusic();
         loopBGM("MainMenu.mp3");
 
+        // Сбрасываем флаг регистрации input действий
+        GameInputActions.resetActionsRegistration();
+
         // Безопасный сброс всех игровых данных
         PlayerComponent.resetAllGameData();
 
@@ -200,11 +205,11 @@ public class MainMenu extends FXGLMenu {
     private StackPane createTitleView(String title) {
         titleColor = new SimpleObjectProperty<>(Color.WHITE);
 
-        Text text = FXGL.getUIFactoryService().newText(title.substring(0, 1), 100.0);
+        Text text = FXGL.getUIFactoryService().newText(title.substring(0, 1), 60.0);
         text.strokeProperty().bind(titleColor);
         text.setStyle("-fx-fill: transparent;-fx-stroke-width: 1.5");
 
-        Text text2 = FXGL.getUIFactoryService().newText(title.substring(1), 100.0);
+        Text text2 = FXGL.getUIFactoryService().newText(title.substring(1), 60.0);
         text2.setFill(null);
         text2.setStroke(titleColor.getValue());
         text2.setStrokeWidth(2.5);
@@ -290,6 +295,13 @@ public class MainMenu extends FXGLMenu {
         MenuButton itemNewGame = new MenuButton(loc.getString("menu.new_game"));
         itemNewGame.setChild(createNewGameMenu());
         box.add(itemNewGame);
+
+        MenuButton itemLeaderboard = new MenuButton("🏆 Таблица лидеров");
+        itemLeaderboard.setOnAction(event -> {
+            LeaderboardUI leaderboardUI = new LeaderboardUI();
+            leaderboardUI.show();
+        });
+        box.add(itemLeaderboard);
 
         MenuButton itemOptions = new MenuButton(loc.getString("menu.options"));
         itemOptions.setChild(createOptionsMenu());
@@ -512,7 +524,7 @@ public class MainMenu extends FXGLMenu {
                 String difficultyName = loc.getString("menu.easy");
                 PlayerComponent.setGameDifficulty(difficultyName);
                 GameEnvironment.get().getDifficultyService().setActiveDifficulty("easy");
-                PlayerComponent.setGold(1000);
+                PlayerComponent.setGold(0);
                 itemEasy.updateText(difficultyName);
             });
 
@@ -522,7 +534,7 @@ public class MainMenu extends FXGLMenu {
                 String difficultyName = loc.getString("menu.medium");
                 PlayerComponent.setGameDifficulty(difficultyName);
                 GameEnvironment.get().getDifficultyService().setActiveDifficulty("normal");
-                PlayerComponent.setGold(800);
+                PlayerComponent.setGold(0);
                 itemMedium.updateText(difficultyName);
             });
 
@@ -532,7 +544,7 @@ public class MainMenu extends FXGLMenu {
                 String difficultyName = loc.getString("menu.hard");
                 PlayerComponent.setGameDifficulty(difficultyName);
                 GameEnvironment.get().getDifficultyService().setActiveDifficulty("hard");
-                PlayerComponent.setGold(600);
+                PlayerComponent.setGold(0);
                 itemHard.updateText(difficultyName);
             });
 

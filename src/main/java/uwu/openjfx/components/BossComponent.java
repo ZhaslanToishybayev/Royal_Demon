@@ -9,7 +9,7 @@ import uwu.openjfx.MainApp;
 import uwu.openjfx.RoyalType;
 import uwu.openjfx.UI;
 import uwu.openjfx.behaviors.DoNothing;
-import uwu.openjfx.hud.GameHUD;
+import uwu.openjfx.hud.ModernGameHUD;
 
 import static com.almasb.fxgl.dsl.FXGLForKtKt.getAudioPlayer;
 import static com.almasb.fxgl.dsl.FXGLForKtKt.loopBGM;
@@ -43,7 +43,7 @@ public class BossComponent extends EnemyComponent {
                 // UI.init() конфликтовал с GameHUD, создавая дублирующие системы HP
                 Entity playerEntity = FXGL.geto("player");
                 if (playerEntity != null) {
-                    new GameHUD(playerEntity).initUI();
+                    ModernGameHUD.init(playerEntity);
                 }
             }
         }
